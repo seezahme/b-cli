@@ -1,0 +1,6 @@
+# backup of the old nested trader repo
+.trader-git-backup/
+node_modules/
+# old grid-bot runtime files
+grid-bot/*.log
+grid-bot/state.*.json

@@ -1,0 +1,10 @@
+{
+  "name": "ai",
+  "version": "1.0.0",
+  "description": "Create bots from a plain-language description with a local model (Ollama, LM Studio, llama.cpp)",
+  "main": "index.js",
+  "commands": {
+    "ai": "ai <description> · ai setup · ai status  — e.g. ai active scalp bot on TSLA with 20 USDT"
+  },
+  "permissions": ["bots:read", "bots:create", "market:read"]
+}

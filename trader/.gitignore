@@ -1,0 +1,10 @@
+# API keys from the Bybit OAuth flow — never commit
+.bybit/
+# bot state and logs
+data/
+# installed plugins (install with: bb-cli plugin install <name>)
+plugins/
+# personal display settings
+settings.json
+node_modules/
+*.tmp

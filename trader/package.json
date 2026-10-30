@@ -1,0 +1,12 @@
+{
+  "name": "bb-cli",
+  "version": "1.0.0",
+  "description": "Bybit spot trading bots with a terminal dashboard",
+  "private": true,
+  "bin": {
+    "bb-cli": "bb-cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

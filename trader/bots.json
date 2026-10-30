@@ -1,0 +1,25 @@
+[
+  {
+    "name": "scalp-btc",
+    "type": "scalp",
+    "symbol": "BTCUSDT",
+    "budgetUsdt": 50,
+    "signal": "breakout",
+    "windowSec": 30
+  },
+  {
+    "name": "scalp-btc-active",
+    "type": "scalp",
+    "symbol": "BTCUSDT",
+    "budgetUsdt": 50,
+    "windowSec": 10,
+    "entryPct": 0.5
+  },
+  {
+    "name": "scalp-beam",
+    "type": "scalp",
+    "symbol": "BEAMUSDT",
+    "budgetUsdt": 100,
+    "entryPct": 0.05
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "symbol": "BTCUSDT",
+  "env": "mainnet",
+  "budgetUsdt": 50,
+  "levels": 5,
+  "rangePct": 4,
+  "lower": null,
+  "upper": null,
+  "stopLossPct": 3,
+  "sellOnStop": true,
+  "feeRate": 0.001,
+  "pollSeconds": 15,
+  "paperStartUsdt": 50
+}
