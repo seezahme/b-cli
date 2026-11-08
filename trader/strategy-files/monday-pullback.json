@@ -1,0 +1,28 @@
+{
+  "format": "bb-strategy/1",
+  "name": "monday-pullback",
+  "description": "Monday pullback (idea inspired by QuantLab's 'UK100 3x Drop Monday Pullback', own rules): on Mondays, after 3 falling hourly candles in a longer uptrend, buys the dip. ATR stop and target, sells early if RSI recovers.",
+  "author": "bb-cli",
+  "version": "1.0.0",
+  "interval": "60",
+  "params": {
+    "trend": { "default": 100, "min": 10, "max": 300, "describe": "EMA that must be below the price (uptrend filter)" },
+    "slAtr": { "default": 2, "min": 0.3, "max": 10, "describe": "stop distance, ATRs" },
+    "tpAtr": { "default": 2, "min": 0.3, "max": 20, "describe": "target distance, ATRs" }
+  },
+  "indicators": {
+    "ema": { "type": "ema", "period": "$trend" },
+    "atr": { "type": "atr", "period": 14 },
+    "rsi": { "type": "rsi", "period": 14 }
+  },
+  "rules": [
+    {
+      "name": "3x drop",
+      "when": ["weekday == 1", "close < close[1]", "close[1] < close[2]", "close[2] < close[3]", "close > ema"],
+      "stopLoss": "entry - atr * $slAtr",
+      "takeProfit": "entry + atr * $tpAtr",
+      "exit": ["rsi > 65"]
+    }
+  ],
+  "show": [{ "label": "RSI", "value": "rsi" }]
+}

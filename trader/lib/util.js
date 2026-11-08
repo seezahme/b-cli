@@ -3,13 +3,13 @@ const path = require("path");
 
 const ROOT = path.resolve(__dirname, "..");
 const DATA = path.join(ROOT, "data");
-const STRATEGIES = ["grid", "dca", "trend", "scalp"];
+const STRATEGIES = ["grid", "dca", "trend", "scalp", "auto"];
 
 // BB_COLOR=1 is set by the monitor for commands whose output it captures.
 const useColor = (process.stdout.isTTY || process.env.BB_COLOR === "1") && !process.env.NO_COLOR;
 const wrap = (code) => (s) => (useColor ? `\x1b[${code}m${s}\x1b[0m` : String(s));
 const c = {
-  red: wrap(31), green: wrap(32), yellow: wrap(33), blue: wrap(34), magenta: wrap(35), cyan: wrap(36),
+  red: wrap(31), green: wrap(32), yellow: wrap(33), blue: wrap(34), cyan: wrap(36),
   gray: wrap(90), bold: wrap(1), dim: wrap(2), inverse: wrap(7),
 };
 const stripAnsi = (s) => String(s).replace(/\x1b\[[0-9;?]*[A-Za-z]/g, "");

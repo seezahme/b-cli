@@ -1,0 +1,29 @@
+{
+  "format": "bb-strategy/1",
+  "name": "fvg",
+  "description": "Fair Value Gap: in an uptrend, waits for price to come back into a bullish gap and hold it, then buys. Stop under the gap, target a set reward-to-risk.",
+  "author": "bb-cli",
+  "version": "1.0.0",
+  "interval": "15",
+  "params": {
+    "trend": { "default": 50, "min": 10, "max": 300, "describe": "EMA that must be below the price (uptrend filter)" },
+    "minGap": { "default": 0.1, "min": 0, "max": 5, "describe": "smallest gap, % of price" },
+    "maxAge": { "default": 30, "min": 3, "max": 200, "describe": "ignore gaps older than this, candles" },
+    "slAtr": { "default": 0.5, "min": 0, "max": 5, "describe": "stop this many ATRs under the gap" },
+    "rr": { "default": 2, "min": 0.5, "max": 10, "describe": "target = risk x this (reward-to-risk)" }
+  },
+  "indicators": {
+    "gap": { "type": "fvg", "minPct": "$minGap", "maxAge": "$maxAge" },
+    "ema": { "type": "ema", "period": "$trend" },
+    "atr": { "type": "atr", "period": 14 }
+  },
+  "rules": [
+    {
+      "name": "FVG retest",
+      "when": ["close > ema", "gap.age >= 2", "low <= gap.top", "close >= gap.bottom", "close > open"],
+      "stopLoss": "gap.bottom - atr * $slAtr",
+      "takeProfit": "entry + (entry - gap.bottom + atr * $slAtr) * $rr"
+    }
+  ],
+  "show": [{ "label": "gap top", "value": "gap.top" }, { "label": "gap bottom", "value": "gap.bottom" }]
+}

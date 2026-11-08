@@ -10,7 +10,7 @@ const defaults = {
 
 const describe = {
   pollSeconds: "seconds between price checks",
-  signal: "dip = buy a quick drop from the recent high · breakout = buy a quick rise to a new high",
+  signal: "dip = buy a quick drop from the recent high | breakout = buy a quick rise to a new high",
   windowSec: "look-back window for the recent high/low, in seconds",
   entryPct: "move from the window high (dip) or low (breakout) that triggers a buy, %",
   takeProfitPct: "sell target above the entry, % (must beat round-trip fees)",
@@ -211,13 +211,15 @@ function position(s) {
 function info(s, cfg) {
   const x = s.scalp;
   if (!x) return "";
-  const wl = `W${x.wins}/L${x.losses}`;
-  const sig = `${cfg.signal} ${x.move >= 0 ? "+" : ""}${x.move.toFixed(2)}%/${cfg.signal === "dip" ? "-" : "+"}${cfg.entryPct}`;
-  if (x.state === "buying") return `bid ${fmtPrice(x.orderPrice)} · ${wl}`;
+  const score = `won ${x.wins} lost ${x.losses}`;
+  if (x.state === "buying") return `buy order @ ${fmtPrice(x.orderPrice)} | ${score}`;
   if (x.state === "holding" || x.state === "selling") {
-    return `TP ${fmtPrice(x.entry * (1 + cfg.takeProfitPct / 100))} SL ${fmtPrice(x.entry * (1 - cfg.stopLossPct / 100))} · ${wl}`;
+    return `sell @ ${fmtPrice(x.entry * (1 + cfg.takeProfitPct / 100))} stop @ ${fmtPrice(x.entry * (1 - cfg.stopLossPct / 100))} | ${score}`;
   }
-  return `${sig} · ${wl}`;
+  // move = % from the window high (dip) or low (breakout); a buy fires at ±entryPct
+  const pct = (n) => `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`;
+  const need = cfg.signal === "dip" ? -cfg.entryPct : cfg.entryPct;
+  return `${cfg.signal} ${pct(x.move)}, buys at ${pct(need)} | ${score}`;
 }
 
 const openOrders = (s) => (s.scalp && (s.scalp.state === "buying" || s.scalp.state === "selling") ? 1 : 0);

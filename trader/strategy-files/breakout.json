@@ -1,0 +1,29 @@
+{
+  "format": "bb-strategy/1",
+  "name": "breakout",
+  "description": "Buys when the price closes above its highest high of the last N candles with rising momentum (MACD), rides it with an ATR trailing stop.",
+  "author": "bb-cli",
+  "version": "1.0.0",
+  "interval": "60",
+  "params": {
+    "lookback": { "default": 20, "min": 5, "max": 200, "describe": "candles in the breakout range" },
+    "slAtr": { "default": 2, "min": 0.5, "max": 10, "describe": "stop distance in ATRs" },
+    "trailAtr": { "default": 3, "min": 0.5, "max": 10, "describe": "trailing stop distance in ATRs" }
+  },
+  "indicators": {
+    "dc": { "type": "donchian", "period": "$lookback" },
+    "atr": { "type": "atr", "period": 14 },
+    "macd": { "type": "macd", "fast": 12, "slow": 26, "signal": 9 },
+    "ema200": { "type": "ema", "period": 200 }
+  },
+  "rules": [
+    {
+      "name": "breakout",
+      "when": ["close > dc.upper", "macd.hist > 0", "close > ema200"],
+      "stopLoss": "entry - atr * $slAtr",
+      "trailing": "atr * $trailAtr",
+      "exit": ["close < dc.middle"]
+    }
+  ],
+  "show": [{ "label": "ATRs to breakout", "value": "(dc.upper - close) / atr" }, { "label": "MACD hist", "value": "macd.hist" }]
+}

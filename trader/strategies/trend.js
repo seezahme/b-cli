@@ -99,8 +99,8 @@ function info(s, cfg) {
   if (!t || t.fast == null) return "waiting for candles";
   const dir = t.fast > t.slow ? "▲" : "▼";
   const parts = [`EMA${cfg.fast} ${fmtPrice(t.fast)} ${dir} EMA${cfg.slow} ${fmtPrice(t.slow)}`];
-  if (t.qty > 0) parts.push(`SL ${fmtPrice(t.entry * (1 - cfg.stopLossPct / 100))} TP ${fmtPrice(t.entry * (1 + cfg.takeProfitPct / 100))}`);
-  return parts.join(" · ");
+  if (t.qty > 0) parts.push(`stop @ ${fmtPrice(t.entry * (1 - cfg.stopLossPct / 100))} sell @ ${fmtPrice(t.entry * (1 + cfg.takeProfitPct / 100))}`);
+  return parts.join(" | ");
 }
 
 const openOrders = () => 0;

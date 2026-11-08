@@ -1,11 +1,13 @@
 const { createApi } = require("./api");
 const { paperBroker } = require("./broker");
+const R = require("./rules");
 
 const STRATS = {
   grid: require("../strategies/grid"),
   dca: require("../strategies/dca"),
   trend: require("../strategies/trend"),
   scalp: require("../strategies/scalp"),
+  auto: require("../strategies/auto"),
 };
 
 const INTERVAL_MIN = { 1: 1, 3: 3, 5: 5, 15: 15, 30: 30, 60: 60, 120: 120, 240: 240, 360: 360, 720: 720, D: 1440 };
@@ -46,10 +48,14 @@ async function backtest(bot, { days = 7, interval } = {}) {
   const inst = await api.instrument(cfg.symbol);
   st.validate(cfg, inst);
 
-  const step = cfg.type === "trend" ? String(cfg.interval) : String(interval || (cfg.type === "scalp" ? "1" : "5"));
+  // auto bots trade on their strategy file's candles and need its indicators warmed up
+  const strat = cfg.type === "auto" ? R.load(cfg.strategy) : null;
+  const step = cfg.type === "trend" ? String(cfg.interval)
+    : strat ? String(cfg.interval ?? strat.interval)
+    : String(interval || (cfg.type === "scalp" ? "1" : "5"));
   const stepMin = INTERVAL_MIN[step];
   if (!stepMin) throw new Error(`unsupported interval ${step} (${Object.keys(INTERVAL_MIN).join(", ")})`);
-  const warm = cfg.type === "trend" ? cfg.slow * 4 : 0;
+  const warm = cfg.type === "trend" ? cfg.slow * 4 : strat ? R.series(strat, null, R.paramValues(strat, cfg)).warm : 0;
   const candles = await fetchHistory(api, cfg.symbol, step, Math.ceil((days * 1440) / stepMin) + warm);
   if (candles.length <= warm + 1) throw new Error("not enough history");
 
@@ -70,7 +76,7 @@ async function backtest(bot, { days = 7, interval } = {}) {
   let halted = null;
   for (; idx < candles.length; idx++) {
     const k = candles[idx];
-    ctx.tk = { last: k.c, bid: k.c, ask: k.c, high: k.h, low: k.l };
+    ctx.tk = { last: k.c, bid: k.c, ask: k.c, open: k.o, high: k.h, low: k.l };
     ctx.now = k.t + stepMin * 60000;
     if (idx === warm) st.init(ctx);
     const cont = await st.tick(ctx);

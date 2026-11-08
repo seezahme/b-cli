@@ -1,0 +1,28 @@
+{
+  "format": "bb-strategy/1",
+  "name": "sweep",
+  "description": "Liquidity Sweep: a candle wicks under the last swing low (taking the stops there) and closes back above it bullish. Buys the reclaim, stop under the wick, target a set reward-to-risk.",
+  "author": "bb-cli",
+  "version": "1.0.0",
+  "interval": "15",
+  "params": {
+    "swing": { "default": 5, "min": 1, "max": 20, "describe": "candles on each side that make a swing low" },
+    "minWick": { "default": 0.2, "min": 0, "max": 5, "describe": "wick must go at least this many ATRs below the swing low" },
+    "slAtr": { "default": 0.3, "min": 0, "max": 5, "describe": "stop this many ATRs under the wick" },
+    "rr": { "default": 2, "min": 0.5, "max": 10, "describe": "target = risk x this (reward-to-risk)" }
+  },
+  "indicators": {
+    "sw": { "type": "swings", "period": "$swing" },
+    "atr": { "type": "atr", "period": 14 },
+    "rsi": { "type": "rsi", "period": 14 }
+  },
+  "rules": [
+    {
+      "name": "sweep of lows",
+      "when": ["low < sw.low", "close > sw.low", "close > open", "(sw.low - low) / atr >= $minWick", "rsi < 50"],
+      "stopLoss": "low - atr * $slAtr",
+      "takeProfit": "entry + (entry - low + atr * $slAtr) * $rr"
+    }
+  ],
+  "show": [{ "label": "swing low", "value": "sw.low" }, { "label": "RSI", "value": "rsi" }]
+}

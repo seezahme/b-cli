@@ -15,6 +15,10 @@ const PERMISSIONS = {
   "bots:read": "see your bot list (names, types, pairs, budgets)",
   "bots:create": "add new bots to bots.json after you confirm (can't start them)",
   "market:read": "look up Bybit spot pairs and prices (public data, no API keys)",
+  "bots:analyze": "read your bots' results, positions and trade logs, run backtests (no keys or balances)",
+  "bots:update": "propose setting changes to a bot (you confirm each one)",
+  "bots:stop": "propose stopping a running bot (you confirm; live sells need the bot's name typed)",
+  "strategies:write": "propose new strategy files (you confirm; never overwrites)",
 };
 
 function readManifest(dir) {
@@ -94,13 +98,20 @@ function run(plugin, cmd, args, host) {
     execArgv: ["--permission", `--allow-fs-read=${plugin.dir}`, `--allow-fs-read=${SANDBOX}`, `--allow-fs-write=${data}`],
     stdio: ["ignore", "inherit", "inherit", "ipc"],
   });
-  const gate = { bots: "bots:read", types: null, symbols: "market:read", ticker: "market:read", validateBot: "bots:read", createBot: "bots:create" };
+  // host call -> permission it needs (null = always allowed). Nothing here can start a bot.
+  const gate = {
+    print: null, ask: null, progress: null, types: null,
+    bots: "bots:read", validateBot: "bots:read", strategies: "bots:read", checkStrategy: "bots:read",
+    symbols: "market:read", ticker: "market:read",
+    createBot: "bots:create", report: "bots:analyze", backtest: "bots:analyze",
+    updateBot: "bots:update", stopBot: "bots:stop", saveStrategy: "strategies:write",
+  };
   child.on("message", async (msg) => {
     if (!msg || typeof msg.id !== "number") return;
     let reply;
     try {
       const need = gate[msg.call];
-      if (need === undefined && !["print", "ask"].includes(msg.call)) throw new Error(`unknown host call "${msg.call}"`);
+      if (need === undefined || !Object.hasOwn(gate, msg.call)) throw new Error(`unknown host call "${msg.call}"`);
       if (need && !plugin.permissions.includes(need)) throw new Error(`plugin "${plugin.name}" lacks the ${need} permission`);
       reply = { id: msg.id, result: await host[msg.call](...(msg.args || [])) };
     } catch (e) {

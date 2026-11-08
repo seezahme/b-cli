@@ -1,0 +1,34 @@
+{
+  "format": "bb-strategy/1",
+  "name": "session-open",
+  "description": "US session open momentum (idea inspired by QuantLab's 'Session Open Momentum', own rules): on weekdays, from 15 to 90 minutes after the US stock market opens, buys a break above the last 3 candles' high in an uptrend. Exits on stop, target, or 3 hours after the open.",
+  "author": "bb-cli",
+  "version": "1.0.0",
+  "interval": "5",
+  "params": {
+    "openHour": { "default": 14, "min": 0, "max": 23, "describe": "US open hour in UTC: 14 in winter (EST), 13 in summer (EDT)" },
+    "openMinute": { "default": 30, "min": 0, "max": 59, "describe": "US open minute, UTC" },
+    "slAtr": { "default": 1.5, "min": 0.3, "max": 10, "describe": "stop distance, ATRs" },
+    "tpAtr": { "default": 3, "min": 0.3, "max": 20, "describe": "target distance, ATRs" }
+  },
+  "indicators": {
+    "range": { "type": "donchian", "period": 3 },
+    "ema": { "type": "ema", "period": 50 },
+    "atr": { "type": "atr", "period": 14 }
+  },
+  "rules": [
+    {
+      "name": "open breakout",
+      "when": [
+        "weekday >= 1", "weekday <= 5",
+        "hour * 60 + minute - ($openHour * 60 + $openMinute) >= 15",
+        "hour * 60 + minute - ($openHour * 60 + $openMinute) <= 90",
+        "close > range.upper", "close > ema", "close > open"
+      ],
+      "stopLoss": "entry - atr * $slAtr",
+      "takeProfit": "entry + atr * $tpAtr",
+      "exit": ["hour * 60 + minute - ($openHour * 60 + $openMinute) >= 180"]
+    }
+  ],
+  "show": [{ "label": "min since open", "value": "hour * 60 + minute - ($openHour * 60 + $openMinute)" }]
+}

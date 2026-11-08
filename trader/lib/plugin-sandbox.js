@@ -28,6 +28,14 @@ const host = {
   ticker: call("ticker"),
   validateBot: call("validateBot"),
   createBot: call("createBot"),
+  progress: call("progress"),
+  strategies: call("strategies"),
+  checkStrategy: call("checkStrategy"),
+  report: call("report"),
+  backtest: call("backtest"),
+  updateBot: call("updateBot"),
+  stopBot: call("stopBot"),
+  saveStrategy: call("saveStrategy"),
 };
 
 (async () => {

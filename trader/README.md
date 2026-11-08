@@ -13,10 +13,24 @@ bb-cli help            # everything else
 Run `.\bb-cli` inside this folder, or `npm link` once to get `bb-cli` everywhere. Needs Node 20+ (Node 22+ for plugins).
 
 ## Strategies
-`grid`, `dca`, `trend` and `scalp`. `bb-cli types` lists each with its settings. Bots live in `bots.json`.
+`grid`, `dca`, `trend`, `scalp` and `auto`. `bb-cli types` lists each with its settings. Bots live in `bots.json`.
+
+### Strategy files (auto bots)
+An `auto` bot runs a strategy file from `strategy-files/`: it reads the market through indicators, buys when a rule matches and places that rule's stop-loss, take-profit and trailing stop by itself.
+
+```
+bb-cli strategy list                 # adaptive, breakout, fvg, bos, sweep, session-open, monday-pullback
+bb-cli strategy show fvg             # rules, indicators and params
+bb-cli new my-bot type=auto strategy=fvg symbol=BTCUSDT budget=10 rr=3
+bb-cli strategy export fvg           # writes fvg.bb-strategy.json to share
+bb-cli strategy import <file | https link>
+bb-cli strategy new my-idea --from bos   # copy one to edit
+```
+
+Strategy files are JSON data, not code: rules like `"close crossesAbove sw.high"` or `"entry - atr * $slAtr"` are read by a small built-in parser, so an imported file can't run anything on your machine. Indicators: `ema`, `sma`, `rsi`, `atr`, `bollinger`, `adx`, `macd`, `donchian`, `swings` (market structure), `fvg` (fair value gaps). Rules can also use `open/high/low/close`, `close[1]` (one candle back), `hour`, `minute`, `weekday` (UTC) and `entry`.
 
 ## Keys
-API keys come from the Bybit OAuth flow and are read from `.bybit/oauth_token.json` (git-ignored) or `BYBIT_API_KEY` / `BYBIT_API_SECRET`.
+`bb-cli login` opens Bybit in your browser; after you authorize, it picks or creates an AI subaccount and saves its API key pair to `.bybit/oauth_token.json` (git-ignored, readable only by you). `bb-cli login status` shows the masked key. Keys can also come from `BYBIT_API_KEY` / `BYBIT_API_SECRET`.
 
 ## Plugins
 Plugins aren't active in a fresh clone; install them with `bb-cli plugin install <name | folder | git URL>`. They run in a Node permission sandbox: they read only their own folder, write only their `data/` folder, can't start processes and never see API keys. What they can ask bb-cli to do is limited to the permissions in their `plugin.json` (`bots:read`, `bots:create`, `market:read`), and bb-cli asks you before adding a bot.

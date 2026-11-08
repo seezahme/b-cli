@@ -1,0 +1,31 @@
+{
+  "format": "bb-strategy/1",
+  "name": "bos",
+  "description": "Break of Structure: buys when a candle closes above the last swing high in an uptrend. Stop under the last swing low, target a set reward-to-risk, trailing stop to ride the move.",
+  "author": "bb-cli",
+  "version": "1.0.0",
+  "interval": "15",
+  "params": {
+    "swing": { "default": 3, "min": 1, "max": 20, "describe": "candles on each side that make a swing high/low" },
+    "trend": { "default": 100, "min": 10, "max": 300, "describe": "EMA that must be below the price (uptrend filter)" },
+    "maxRiskAtr": { "default": 4, "min": 0.5, "max": 20, "describe": "skip when the swing low is more than this many ATRs away" },
+    "slAtr": { "default": 0.3, "min": 0, "max": 5, "describe": "stop this many ATRs under the swing low" },
+    "rr": { "default": 2, "min": 0.5, "max": 10, "describe": "target = risk x this (reward-to-risk)" },
+    "trailAtr": { "default": 3, "min": 0.5, "max": 10, "describe": "trailing stop distance, ATRs" }
+  },
+  "indicators": {
+    "sw": { "type": "swings", "period": "$swing" },
+    "ema": { "type": "ema", "period": "$trend" },
+    "atr": { "type": "atr", "period": 14 }
+  },
+  "rules": [
+    {
+      "name": "BOS up",
+      "when": ["close crossesAbove sw.high", "close > ema", "(close - sw.low) / atr < $maxRiskAtr"],
+      "stopLoss": "sw.low - atr * $slAtr",
+      "takeProfit": "entry + (entry - sw.low + atr * $slAtr) * $rr",
+      "trailing": "atr * $trailAtr"
+    }
+  ],
+  "show": [{ "label": "swing high", "value": "sw.high" }, { "label": "swing low", "value": "sw.low" }]
+}

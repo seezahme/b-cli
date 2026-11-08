@@ -1,10 +1,18 @@
 {
   "name": "ai",
-  "version": "1.0.0",
-  "description": "Create bots from a plain-language description with a local model (Ollama, LM Studio, llama.cpp)",
+  "version": "1.1.0",
+  "description": "Local AI (Ollama, LM Studio, llama.cpp): creates bots and strategy files from a description, reviews bots and proposes keep, adjust or stop",
   "main": "index.js",
   "commands": {
-    "ai": "ai <description> · ai setup · ai status  — e.g. ai active scalp bot on TSLA with 20 USDT"
+    "ai": "ai <description> | ai strategy <description> | ai review [bot|all] | ai setup | ai status"
   },
-  "permissions": ["bots:read", "bots:create", "market:read"]
+  "permissions": [
+    "bots:read",
+    "bots:create",
+    "market:read",
+    "bots:analyze",
+    "bots:update",
+    "bots:stop",
+    "strategies:write"
+  ]
 }

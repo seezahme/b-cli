@@ -21,5 +21,61 @@
     "symbol": "BEAMUSDT",
     "budgetUsdt": 100,
     "entryPct": 0.05
+  },
+  {
+    "name": "dca-beam-active",
+    "type": "dca",
+    "symbol": "BEAMUSDT",
+    "budgetUsdt": 100,
+    "buyUsdt": 5.5,
+    "intervalMin": 30,
+    "dipPct": 1,
+    "maxBuys": 1,
+    "takeProfitPct": 3,
+    "stopLossPct": 1.5
+  },
+  {
+    "name": "bos",
+    "type": "auto",
+    "symbol": "BTCUSDT",
+    "budgetUsdt": 100
+  },
+  {
+    "name": "adaptive",
+    "type": "auto",
+    "symbol": "BTCUSDT",
+    "budgetUsdt": 100
+  },
+  {
+    "name": "breakout",
+    "type": "auto",
+    "symbol": "BTCUSDT",
+    "budgetUsdt": 100
+  },
+  {
+    "name": "fvg",
+    "type": "auto",
+    "symbol": "BTCUSDT",
+    "budgetUsdt": 100
+  },
+  {
+    "name": "sweep",
+    "type": "auto",
+    "symbol": "BTCUSDT",
+    "budgetUsdt": 100
+  },
+  {
+    "name": "scalp-tsla",
+    "type": "scalp",
+    "symbol": "TSLAXUSDT",
+    "budgetUsdt": 50,
+    "cooldownSec": 15,
+    "entryPct": 0.1,
+    "maxHoldMin": 10,
+    "orderTimeoutSec": 10,
+    "pollSeconds": 5,
+    "signal": "dip",
+    "stopLossPct": 0.3,
+    "takeProfitPct": 0.25
   }
 ]

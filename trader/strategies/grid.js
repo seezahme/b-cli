@@ -144,7 +144,7 @@ function info(s) {
   if (!s.grid) return "";
   const g = s.grid;
   const busy = g.slots.filter((x) => x.state !== "idle").length;
-  return `${fmtPrice(g.lower)}..${fmtPrice(g.upper)} · ${busy}/${g.slots.length} lvls`;
+  return `range ${fmtPrice(g.lower)}-${fmtPrice(g.upper)} | ${busy}/${g.slots.length} levels in use`;
 }
 
 const openOrders = (s) => (s.grid ? s.grid.slots.filter(active).length : 0);

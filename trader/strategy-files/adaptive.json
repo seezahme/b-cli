@@ -1,0 +1,52 @@
+{
+  "format": "bb-strategy/1",
+  "name": "adaptive",
+  "description": "Reads the market regime with ADX. Trending: buys pullbacks in an uptrend. Sideways: buys oversold dips at the lower Bollinger band. Stops and targets scale with volatility (ATR).",
+  "author": "bb-cli",
+  "version": "1.0.0",
+  "interval": "15",
+  "params": {
+    "fast": { "default": 20, "min": 5, "max": 100, "describe": "fast EMA, candles" },
+    "slow": { "default": 50, "min": 10, "max": 200, "describe": "slow EMA, candles" },
+    "adxTrend": { "default": 22, "min": 10, "max": 50, "describe": "ADX above this = trending market" },
+    "slAtr": { "default": 2, "min": 0.5, "max": 10, "describe": "stop distance in ATRs" },
+    "tpAtr": { "default": 3, "min": 0.5, "max": 20, "describe": "target distance in ATRs (trend rule)" },
+    "trailAtr": { "default": 2.5, "min": 0.5, "max": 10, "describe": "trailing stop distance in ATRs (trend rule)" }
+  },
+  "indicators": {
+    "emaFast": { "type": "ema", "period": "$fast" },
+    "emaSlow": { "type": "ema", "period": "$slow" },
+    "rsi": { "type": "rsi", "period": 14 },
+    "atr": { "type": "atr", "period": 14 },
+    "bb": { "type": "bollinger", "period": 20, "mult": 2 },
+    "adx": { "type": "adx", "period": 14 }
+  },
+  "rules": [
+    {
+      "name": "trend pullback",
+      "when": [
+        "adx.adx > $adxTrend",
+        "adx.plus > adx.minus",
+        "emaFast > emaSlow",
+        "close > emaSlow",
+        "rsi crossesAbove 50"
+      ],
+      "stopLoss": "entry - atr * $slAtr",
+      "takeProfit": "entry + atr * $tpAtr",
+      "trailing": "atr * $trailAtr",
+      "exit": ["emaFast crossesBelow emaSlow"]
+    },
+    {
+      "name": "range dip",
+      "when": [
+        "adx.adx < $adxTrend",
+        "close < bb.lower",
+        "rsi < 30"
+      ],
+      "stopLoss": "entry - atr * $slAtr",
+      "takeProfit": "bb.middle",
+      "exit": ["rsi > 65"]
+    }
+  ],
+  "show": [{ "label": "ADX", "value": "adx.adx" }, { "label": "RSI", "value": "rsi" }]
+}

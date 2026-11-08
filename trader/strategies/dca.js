@@ -87,9 +87,9 @@ function info(s, cfg) {
   const d = s.dca;
   if (!d) return "";
   const parts = [`buys ${d.buys}/${maxBuys(cfg)}`];
-  if (d.qty > 0) parts.push(`TP ${fmtPrice((d.cost / d.qty) * (1 + cfg.takeProfitPct / 100))}`);
-  if (d.buys > 0 && d.buys < maxBuys(cfg)) parts.push(`next ≤${fmtPrice(d.lastBuyPrice * (1 - cfg.dipPct / 100))}`);
-  return parts.join(" · ");
+  if (d.qty > 0) parts.push(`sell @ ${fmtPrice((d.cost / d.qty) * (1 + cfg.takeProfitPct / 100))}`);
+  if (d.buys > 0 && d.buys < maxBuys(cfg)) parts.push(`next buy <= ${fmtPrice(d.lastBuyPrice * (1 - cfg.dipPct / 100))}`);
+  return parts.join(" | ");
 }
 
 const openOrders = () => 0;
