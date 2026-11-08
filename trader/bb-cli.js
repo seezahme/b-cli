@@ -542,10 +542,16 @@ async function cmdMonitor() {
     const before = input.slice(0, cursor);
     const parts = before.split(/\s+/);
     const word = parts[parts.length - 1];
+    const bots = U.loadBots().map((b) => b.name);
+    // plugins can list completions per preceding words in plugin.json "complete"; "@bots" = bot names
+    const said = parts.slice(0, -1).join(" ");
+    const fromPlugin = PLUGINS.installed().map((p) => p.complete?.[said]).find(Array.isArray);
     const pool = parts.length === 1
       ? [...reservedNames(), ...PLUGINS.installed().flatMap((p) => Object.keys(p.commands))]
-      : [...U.loadBots().map((b) => b.name), "all", "--live", "--sell", "--paper", "--days", "--trades", "--force",
-         ...Object.keys(STRATS).map((t) => `type=${t}`), ...RULES.list().map((s) => `strategy=${s.name}`)];
+      : fromPlugin
+        ? fromPlugin.flatMap((x) => (x === "@bots" ? bots : [x]))
+        : [...bots, "all", "--live", "--sell", "--paper", "--days", "--trades", "--force",
+           ...Object.keys(STRATS).map((t) => `type=${t}`), ...RULES.list().map((s) => `strategy=${s.name}`)];
     const hits = [...new Set(pool)].filter((x) => x.startsWith(word)).sort();
     if (!hits.length) return;
     const start = cursor - word.length;
@@ -1352,6 +1358,18 @@ function pluginHost() {
 }
 
 async function runPlugin(plugin) {
+  // a newer copy in plugins-catalog/ (e.g. after git pull) is offered before running; new permissions need a yes
+  const latest = PLUGINS.available().find((p) => p.name === plugin.name);
+  if (latest && PLUGINS.newer(latest.version, plugin.version)) {
+    const added = latest.permissions.filter((x) => !plugin.permissions.includes(x));
+    console.log(c.yellow(`${plugin.name} ${latest.version} is available (installed: ${plugin.version || "?"})`));
+    for (const x of added) console.log(`  new permission: ${x} ${c.gray(`(${PLUGINS.PERMISSIONS[x]})`)}`);
+    const a = canAsk() ? ((await ask(`update ${plugin.name} now? [Y/n]: `)) || "y").toLowerCase() : "n";
+    if (a === "y" || a === "yes") {
+      plugin = PLUGINS.stage(latest.name, reservedNames()).commit();
+      console.log(`${c.green("ok")} updated to ${plugin.version}`);
+    } else console.log(c.gray(`  keeping ${plugin.version}; update later with: bb-cli plugin install ${plugin.name}`));
+  }
   const code = await PLUGINS.run(plugin, cmd, argv.slice(1), pluginHost());
   process.exitCode = code;
 }

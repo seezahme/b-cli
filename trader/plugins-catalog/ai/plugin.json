@@ -14,5 +14,35 @@
     "bots:update",
     "bots:stop",
     "strategies:write"
-  ]
+  ],
+  "complete": {
+    "ai": [
+      "setup",
+      "status",
+      "review",
+      "strategy",
+      "help"
+    ],
+    "ai setup": [
+      "ollama",
+      "lmstudio",
+      "llamacpp",
+      "anthropic",
+      "openai",
+      "gemini",
+      "openrouter",
+      "groq",
+      "mistral",
+      "deepseek",
+      "xai",
+      "together",
+      "--new-key"
+    ],
+    "ai review": [
+      "all",
+      "@bots",
+      "--days",
+      "--no-backtest"
+    ]
+  }
 }

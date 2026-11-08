@@ -31,6 +31,14 @@ function readManifest(dir) {
   return { ...m, permissions: m.permissions || [], dir };
 }
 
+// true when version a is above b ("1.10.0" > "1.9.2"); missing parts count as 0
+function newer(a, b) {
+  const pa = String(a || "0").split(".").map(Number);
+  const pb = String(b || "0").split(".").map(Number);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) if ((pa[i] || 0) !== (pb[i] || 0)) return (pa[i] || 0) > (pb[i] || 0);
+  return false;
+}
+
 function installed() {
   if (!fs.existsSync(DIR)) return [];
   const out = [];
@@ -122,4 +130,4 @@ function run(plugin, cmd, args, host) {
   return new Promise((resolve) => child.on("exit", (code) => resolve(code ?? 1)));
 }
 
-module.exports = { DIR, CATALOG, PERMISSIONS, installed, available, findCommand, stage, remove, run };
+module.exports = { DIR, CATALOG, PERMISSIONS, newer, installed, available, findCommand, stage, remove, run };
